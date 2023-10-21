@@ -1,8 +1,6 @@
 const { hash, compare } = require("bcrypt");
 const { sign } = require("jsonwebtoken");
 
-
-
 const comparePassword = async (password, hashedPassword) => {
   try {
     const isMatch = await compare(password, hashedPassword);
@@ -21,11 +19,9 @@ const hashPassword = async (password) => {
   }
 };
 
-
 const Generatetoken = (email) => {
   return sign({ email }, process.env.SECRET, { expiresIn: process.env.EXPIRY });
 };
-
 
 module.exports = {
   hashPassword,

@@ -1,6 +1,6 @@
 const {
-    selectUserByEmail,
-    addNewUser,
+    getUserByEmail,
+    insertUser,
     loginUser
 } = require("../models/user-query");
 
@@ -10,13 +10,18 @@ const {
     Generatetoken,
   } = require("../helpers/auth");
 
-const addUserService = async (userDetails) => {
+const insertUserService = async (userDetails) => {
     try {
-      
+
+
+      const [user] = await getUserByEmail(userDetails.email);
+      if (user) {
+      throw new Error("Please Use Different Email");
+    }
       userDetails.password = await hashPassword(userDetails.password);
 
-      // Adding  new user
-      await addNewUser(userDetails);
+      
+      await insertUser(userDetails);
   
       return {
         success: true,
@@ -29,13 +34,13 @@ const addUserService = async (userDetails) => {
 
   const loginService = async (email, password) => {
     try {
-      // chech if user already present
-      const [user] = await selectUserByEmail(email);
+      
+      const [user] = await getUserByEmail(email);
       console.log(user)
       if (!user) {
         throw new Error("Login failed. Invalid email !");
       }
-  
+      console.log(password);
       // Comparing the password sent by the user with the password stored in database
       const isSame = await comparePassword(password, user.password);
 
@@ -63,6 +68,6 @@ const addUserService = async (userDetails) => {
 
 
   module.exports = {
-    addUserService,
+    insertUserService,
     loginService
   }

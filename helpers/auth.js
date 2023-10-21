@@ -23,7 +23,6 @@ const hashPassword = async (password) => {
 
 
 const Generatetoken = (email) => {
-  console.log(process.env.SECRET)
   return sign({ email }, process.env.SECRET, { expiresIn: process.env.EXPIRY });
 };
 

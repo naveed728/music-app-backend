@@ -1,11 +1,20 @@
 const {
-    addUserService,
+    insertUserService,
     loginService
 } = require("../services/user-service");
+
+const {
+  ValidateEmail
+}
+=require("../helpers/validate-email");
 
 const validateField = (field, fieldName) => {
   if (!field) {
     throw new Error(`Valid ${fieldName} is required!`);
+  }
+  if(fieldName=="Email" && !ValidateEmail(field)){
+    console.log("Entered here");
+    throw new Error(`Invalid Email id`);
   }
 };
 
@@ -22,7 +31,11 @@ const appendUser = async (req, res) => {
       
       validateUserDetails(userDetails);
 
-      const result = await addUserService(userDetails);
+      userDetails.password = Buffer.from(userDetails.password, "base64").toString("utf-8");
+
+      console.log(userDetails.password);
+
+      const result = await insertUserService(userDetails);
       
       return res
         .status(200)
@@ -35,15 +48,20 @@ const appendUser = async (req, res) => {
   const login = async (req, res) => {
     try {
       var { email, password } = req.body;
+      
   
-      if (!email) {
+      if (!email || !ValidateEmail(email)) {
         throw new Error("Email is not valid.");
       }
       if (!password) {
         throw new Error("password is not valid");
       }
-  
+
+      password= Buffer.from(password, "base64").toString("utf-8");
+      
       console.log("point 1")
+      console.log(password)
+  
       const result = await loginService(email, password);
 
       return res.status(200).json({

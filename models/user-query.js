@@ -1,14 +1,15 @@
 const { connection } = require("../dbconnection");
 const {
     insertUserSql,
-    selectUserByEmailSql
+    getUserByEmailSql
   } = require("./queries");
 
   
-  const addNewUser = async (userDetails) => {
+  const insertUser = async (userDetails) => {
     const { first_name, last_name, email, password } = userDetails;
     try {
       // Insert new user to the database
+      console.log(last_name);
       await connection.query(insertUserSql, [first_name, last_name, email, password]);
       return;
     } catch (error) {
@@ -18,10 +19,10 @@ const {
   };
 
   
-const selectUserByEmail = async (email) => {
+ const getUserByEmail = async (email) => {
     try {
       // Fetch the rows with the same email
-      const [rows] = await connection.query(selectUserByEmailSql, email);
+      const [rows] = await connection.query(getUserByEmailSql, email);
       return rows;
     } catch (error) {
       throw new Error("Error fetchng user !");
@@ -38,4 +39,4 @@ const selectUserByEmail = async (email) => {
     }
   };
 
-  module.exports = { addNewUser,selectUserByEmail  };
+  module.exports = { insertUser,getUserByEmail  };

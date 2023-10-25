@@ -30,5 +30,7 @@ module.exports = {
     FROM friends f
     WHERE f.frienduserid = ?
   );`,
-  getPostsSql: "SELECT * FROM posts WHERE userid <>  ?",
+  getPostsSql: "SELECT * FROM posts ",
+  logInUserSql:"UPDATE user SET is_active = 1 WHERE email = ?",
+  logOutUserSql:"UPDATE user SET is_active = false WHERE email = ?"
 };

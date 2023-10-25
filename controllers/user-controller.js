@@ -6,6 +6,7 @@ const {
   addFriendService,
   getFriendsService,
   getPostsService,
+  logoutService
 } = require("../services/user-service");
 
 const { ValidateEmail } = require("../helpers/validate-email");
@@ -15,7 +16,6 @@ const validateField = (field, fieldName) => {
     throw new Error(`Valid ${fieldName} is required!`);
   }
   if (fieldName == "Email" && !ValidateEmail(field)) {
-    console.log("Entered here");
     throw new Error(`Invalid Email id`);
   }
 };
@@ -75,12 +75,13 @@ const login = async (req, res) => {
 
 const addPost = async (req, res) => {
   const postDetails = req.body;
+  const email = req.user.email;
 
-  if (!postDetails.body && !postDetails.userid) {
-    throw new Error("Request is not valid provide all details");
+  if (!postDetails.body) {
+    throw new Error("Request is not valid provide data to store");
   }
 
-  const result = await createPostService(postDetails);
+  const result = await createPostService(postDetails,email);
   return res.status(200).json({
     success: "sucess",
     message: "It hit the api",
@@ -89,7 +90,8 @@ const addPost = async (req, res) => {
 
 const getNonFriends = async (req, res) => {
   try {
-    const friendDetails = req.body;
+    const friendDetails =  req.user.email;
+    console.log(friendDetails)
     const result = await UnconnectedUsersService(friendDetails);
 
     return res.status(200).json({
@@ -118,7 +120,7 @@ const addFriend = async (req, res) => {
 
 const getFriends = async (req, res) => {
   try {
-    const userDetails = req.body;
+    const userDetails = req.user.email;
     const result = await getFriendsService(userDetails);
 
     return res.status(200).json({
@@ -133,9 +135,11 @@ const getFriends = async (req, res) => {
 
 const getPosts = async (req, res) => {
   try {
-    const userDetails = req.body;
 
-    const result = await getPostsService(userDetails);
+    console.log("mee")
+    const email = req.user.email;
+    console.log(email)
+    const result = await getPostsService(email);
 
     return res.status(200).json({
       success: result.success,
@@ -147,6 +151,22 @@ const getPosts = async (req, res) => {
   }
 };
 
+const logout = async (req, res) => {
+  try {
+
+    const {email} = req.user;
+
+    const result = await logoutService(email);
+  
+    return res.status(200).json({
+      success: result.success,
+      message: result.message
+    });
+  } catch (error) {
+    res.status(400).json({ success: false, message: error.message });
+  }
+};
+
 module.exports = {
   appendUser,
   login,
@@ -155,4 +175,5 @@ module.exports = {
   addFriend,
   getFriends,
   getPosts,
+  logout
 };

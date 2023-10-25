@@ -6,6 +6,7 @@ const {
   insertFriend,
   getUserFriends,
   getPosts,
+  logOutUser,
   loginUser,
 } = require("../models/user-query");
 
@@ -47,8 +48,9 @@ const loginService = async (email, password) => {
     if (!isSame) {
       throw new Error("Login failed. Invalid password !");
     }
-
-    const token = Generatetoken(user.Email);
+    // Set the IsLoggedIn flag as true in database
+    await loginUser(user.email);
+    const token = Generatetoken(user.email);
 
     return {
       success: true,
@@ -65,9 +67,9 @@ const loginService = async (email, password) => {
   }
 };
 
-const createPostService = async (postDetails) => {
+const createPostService = async (postDetails,email) => {
   try {
-    const result = await insertPost(postDetails);
+    const result = await insertPost(postDetails,email);
 
     return {
       success: true,
@@ -106,14 +108,29 @@ const getFriendsService = async (userDetails) => {
   }
 };
 
-const getPostsService = async (userDetails) => {
+const getPostsService = async (email) => {
   try {
-    console.log("p2");
-    return await getPosts(userDetails);
+ 
+    return await getPosts(email);
   } catch (error) {
     throw error;
   }
 };
+
+const logoutService = async (email) => {
+  try {
+   
+   
+    await logOutUser(email);
+    return {
+      success: true,
+      message: "Loged Out.",
+    };
+  } catch (error) {
+    throw error;
+  }
+};
+
 module.exports = {
   insertUserService,
   loginService,
@@ -122,4 +139,5 @@ module.exports = {
   addFriendService,
   getFriendsService,
   getPostsService,
+  logoutService
 };

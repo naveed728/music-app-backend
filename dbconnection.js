@@ -4,7 +4,7 @@ const connection = mysql
   .createConnection({
     host: "localhost",
     user: "root",
-    password: "",
+    password: "naveedkhan11",
     database: "music_app",
   })
   .promise();

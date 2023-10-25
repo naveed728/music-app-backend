@@ -5,9 +5,10 @@ const {
   addFriend,
   getFriends,
 } = require("../controllers/user-controller");
+const { tokenVerification } = require("../middleware/authentication");
 
-router.post("/notfriend", getNonFriends);
+router.get("/notfriend",tokenVerification, getNonFriends);
 router.post("/addfriend", addFriend);
-router.post("/getfriend", getFriends);
+router.get("/getfriend",tokenVerification, getFriends);
 
 module.exports = router;

@@ -7,6 +7,8 @@ const {
   insertFriendSql,
   getUserFriendsSql,
   getPostsSql,
+  logOutUserSql,
+  logInUserSql
 } = require("./queries");
 
 const insertUser = async (userDetails) => {
@@ -20,7 +22,6 @@ const insertUser = async (userDetails) => {
     ]);
     return;
   } catch (error) {
-    console.log("dcsbds");
     throw new Error("Error adding new user !");
   }
 };
@@ -34,34 +35,35 @@ const getUserByEmail = async (email) => {
   }
 };
 
-const loginUser = async (userId) => {
+const loginUser = async (email) => {
   try {
-    await connection.query(updateLoginStatusSql, userId);
+    await connection.query(logInUserSql,email);
     return;
   } catch (error) {
     throw new Error("Error logging in the user !");
   }
 };
 
-const insertPost = async (postDetails) => {
-  const { userid, body } = postDetails;
+const insertPost = async (postDetails, email) => {
   try {
-    await connection.query(insertPostSql, [body, userid]);
-    return;
+    const [user] = await connection.query(getUserByEmailSql, email);
+    const userid = user[0].userid;
+
+    await connection.query(insertPostSql, [postDetails.body, userid]);
   } catch (error) {
     throw new Error("Error adding new post!");
   }
 };
 
 const getUnConnectedUser = async (friendDetails) => {
-  const { userid } = friendDetails;
+  const [user] = await connection.query(getUserByEmailSql,friendDetails);
+   const userid = user[0].userid;
   try {
     const [friendlist] = await connection.query(getUnConnectedUserSql, [
       userid,
       userid,
       userid,
     ]);
-    console.log(friendlist);
     return {
       success: true,
       message: "fetched",
@@ -82,8 +84,10 @@ const insertFriend = async (friendDetails) => {
   throw new Error("Error adding new friend !");
 };
 
-const getUserFriends = async (userDetails) => {
-  const { userid } = userDetails;
+const getUserFriends = async (friendDetails) => {
+   const [user] = await connection.query(getUserByEmailSql,friendDetails);
+   const userid = user[0].userid;
+  console.log(userid)
   try {
     const [friendlist] = await connection.query(getUserFriendsSql, [
       userid,
@@ -100,10 +104,11 @@ const getUserFriends = async (userDetails) => {
   }
 };
 
-const getPosts = async (userDetails) => {
-  const { userid } = userDetails;
+const getPosts = async (email) => {
+
   try {
-    const [postlist] = await connection.query(getPostsSql, [userid]);
+    const [postlist] = await connection.query(getPostsSql, [email]);
+    
     return {
       success: true,
       message: "fetched",
@@ -114,6 +119,14 @@ const getPosts = async (userDetails) => {
   }
 };
 
+const logOutUser = async(email) => {
+  try{
+    await connection.query(logOutUserSql,email);
+  }
+  catch(error){
+    throw new Error("Error logging out user");
+  }
+}
 module.exports = {
   insertUser,
   getUserByEmail,
@@ -122,4 +135,6 @@ module.exports = {
   insertFriend,
   getUserFriends,
   getPosts,
+  logOutUser,
+  loginUser
 };

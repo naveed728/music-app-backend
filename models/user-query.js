@@ -108,7 +108,7 @@ const getPosts = async (email) => {
 
   try {
     const [postlist] = await connection.query(getPostsSql, [email]);
-    
+    console.log(postlist)
     return {
       success: true,
       message: "fetched",
